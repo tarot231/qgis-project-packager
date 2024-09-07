@@ -66,7 +66,7 @@ class ToGPKG(object):
         if self.dialog.checkStoreProject.isChecked():
             del names[0]
         path_map = dict(zip(paths_set, names))
-        
+
         dstgpkg = '/'.join([self.outdir, self.pj.baseName() + '.gpkg'])
         os.makedirs(self.outdir)
 
@@ -119,7 +119,7 @@ def is_layer_in_gpkg(filename, layerName):
     try:
         ds = gdal.OpenEx(filename)
         res = bool(ds.GetLayerByName(layerName))
-    except AttributeError:
+    except (AttributeError, RuntimeError):
         res = False
     finally:
         ds = None

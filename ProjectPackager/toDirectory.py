@@ -85,7 +85,7 @@ class ToDirectory(object):
                 try:
                     ds = gdal.OpenEx(path)
                     fl = ds.GetFileList()
-                except AttributeError:
+                except (AttributeError, RuntimeError):
                     fl = [path]  # for vsifile
                 finally:
                     ds = None
@@ -94,8 +94,8 @@ class ToDirectory(object):
                 qApp.processEvents()
                 try:
                     shutil.copy2(filepath, dstdir)
-                except (IsADirectoryError,  # for linux
-                        PermissionError,    # for windows
+                except (IsADirectoryError,
+                        PermissionError,  # for windows
                         ):  # https://bugs.python.org/issue43095
                     shutil.copytree(filepath,
                             os.path.join(dstdir, os.path.basename(filepath)))

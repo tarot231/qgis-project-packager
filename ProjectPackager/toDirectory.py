@@ -29,7 +29,7 @@ from osgeo import gdal
 from qgis.PyQt.QtCore import QDir
 from qgis.PyQt.QtWidgets import qApp
 from qgis.core import (QgsDataProvider, QgsProviderRegistry, QgsRenderContext,
-                       QgsLayoutItemPicture)
+                       QgsVectorDataProvider, QgsLayoutItemPicture)
 from .symbol import get_symbol_layer_map, set_path_to_symbol_layer
 
 
@@ -127,6 +127,8 @@ class ToDirectory(object):
                 continue
             path, _, _ = src
             dp = lyr.dataProvider()
+            encoding = dp.encoding() \
+                    if isinstance(dp, QgsVectorDataProvider) else None
             parts = reg.decodeUri(dp.name(), lyr.source())
             parts['path'] = QDir(os.path.join(self.outdir,
                     path_map[path], os.path.basename(path))).absolutePath()
@@ -134,6 +136,8 @@ class ToDirectory(object):
             lyr.setDataSource(data_source,
                     lyr.name(), lyr.providerType(),
                     QgsDataProvider.ProviderOptions())
+            if encoding is not None:
+                lyr.dataProvider().setEncoding(encoding)
 
         # Reset path for symbol layer
         for slyr, path in slyr_map.items():
